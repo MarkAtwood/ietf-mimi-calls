@@ -159,7 +159,9 @@ combination Section 5 of {{I-D.ietf-mimi-room-policy}} names.
 ## The Media Component
 
 This document defines a MIMI application component, `media_keys`, whose
-ComponentID is registered in {{iana}}. The component performs no
+ComponentID is requested in {{iana}}. Until one is assigned the
+ComponentID is provisional, so two implementations keying a call
+together agree on it out of band or do not interoperate. The component performs no
 operation on the room's application data; it exists so that media key
 material has a ComponentID of its own, and so that the key schedule
 separates it from every other component by the domain separation
@@ -260,10 +262,16 @@ established by {{I-D.ietf-mimi-protocol}}:
 
 | Name | Value | Description | Reference |
 |---|---|---|---|
-| media_keys | TBD | Media key material for a call | RFCXXXX |
+| media_keys | TBD1 (suggested value 0x0024) | Media key material for a call | RFCXXXX |
+
+The suggested value follows the components {{I-D.ietf-mimi-protocol}},
+Section 10 registers, the last of which is `room_metadata` at 0x0023.
 
 Implementations before assignment use a provisional value agreed between
-them, and such a value is not interoperable.
+them, and such a value is not interoperable. One implementation takes a
+value from the private-use range of {{I-D.ietf-mls-extensions}},
+Section 7.5 for this, so that it cannot collide with whatever is
+assigned.
 
 # Replacement Text for MIMI Content {#content-text}
 
