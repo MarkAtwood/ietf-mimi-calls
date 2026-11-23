@@ -83,11 +83,11 @@ assemble a keyed call out of machinery that all exists, and two
 implementations will not agree, because nothing says which component
 keys the media or what feeds it.
 
-This document says. It also makes an argument the pieces do not make for
-themselves, in {{why}}: the exported secret belongs to the whole MLS
-group, so whether it is the right key for a call depends on whether the
-group is the call. That turns room-policy's note about a call room from
-an example into a requirement.
+This document fills that gap. {{why}} sets out the constraint that
+decides the rest: the exported secret belongs to the whole MLS group, so
+whether it is the right key for a call depends on whether the group is
+the call. A call therefore needs a room of its own, which
+{{own-room}} specifies, and {{subset}} covers a call that has none.
 
 # Conventions and Definitions
 
@@ -108,29 +108,28 @@ SafeExportSecret(ComponentID) = tree_node_[LeafIndex(ComponentID)]_secret
 ~~~
 
 whose root is the `application_export_secret`, derived from the group's
-`epoch_secret`. Two properties of that construction decide this document.
+`epoch_secret`. Two properties of that construction matter here.
 
-The first is welcome: it is forward-secure. Section 4.4 requires an
+It is forward-secure. Section 4.4 requires an
 implementation to treat a component's exported secret as consumed and to
 "delete any source key material according to the deletion schedule in
 Section 9.2 of {{RFC9420}}". A secret recovered later does not expose an
 earlier call.
 
-The second is the constraint: **every member of the group can compute
-it.** The function takes a ComponentID and nothing else. There is no
+It is also computable by every member of the group. The function takes a ComponentID and nothing else. There is no
 per-call context, so a component receives one secret per epoch, and any
 further derivation an application performs on that secret is equally
 computable by every member. Entitlement to a call's media therefore
 cannot be established by deriving keys from the group secret. It can only
 be established by the membership of the group that the secret comes from.
 
-The consequence is simple and easy to get wrong. A call among three
+A call among three
 participants of a twenty-participant room, keyed from that room's
 exported secret, is readable by all twenty, subject only to their
 obtaining the media. The seventeen who are not on the call are not
-attackers in any interesting sense: they are members in good standing of
-the group whose key schedule produced the key. No protocol error has
-occurred. The call is simply not confined to the people on it.
+attackers: they are members of the group whose key schedule produced the
+key, and no protocol error has occurred. The call is not confined to the
+people on it.
 
 So a call keyed this way MUST be a call whose room is its own, and
 {{own-room}} specifies that case. {{subset}} describes what an
@@ -144,8 +143,8 @@ A call MAY be given a room of its own. Such a room is a
 parent-dependent room ({{I-D.ietf-mimi-room-policy}}, Section 5) whose
 parent is the room the call was started from, and whose participants are
 the call's participants. Giving the call its own room makes the MLS
-group's membership and the call's entitled set the same thing, which
-{{why}} shows is what confines the media.
+group's membership and the call's entitled set the same, which {{why}}
+requires.
 
 A room used this way SHOULD also be `fixed_membership`, so that the
 call's participant set is settled when the call starts, which is the
@@ -181,19 +180,19 @@ material of the media layer's own key schedule. A client MUST NOT use the
 This document does not define the media layer's key schedule.
 {{I-D.ietf-sframe-enc}} has one, and a deployment using another supplies
 its own; in both cases `media_secret` is the shared input and the media
-layer derives from it. The boundary is deliberate: what this document
-specifies is where the shared secret comes from, and who can compute it.
+layer derives from it. What this document specifies is where the shared
+secret comes from and who can compute it.
 
 ## Rekeying
 
-Nothing in this document rekeys a call, because the group does it.
+A call is rekeyed by its group rather than by anything in this document.
 
 Every change of the MLS group's epoch changes `media_secret`. Adding a
 participant to the call is a Commit, and so is removing one, so the media
 key changes at each. A client MUST derive a new `media_secret` on
 entering a new epoch and MUST stop using the previous one for new media.
 
-Two properties follow, and they are the reason to prefer this shape:
+Two properties follow:
 
 * A participant removed from the call loses access to subsequent media at
   once, because the epoch they were removed in is the last one whose
@@ -230,20 +229,18 @@ room.
 
 # Security Considerations
 
-The whole of {{why}} is a security consideration, and is the reason this
-document exists rather than a sentence in another one.
+{{why}} is a security consideration throughout.
 
 An implementation that keys a call from a room's exported secret without
 giving the call its own room has built a call that every member of the
 room can decrypt. This is not detectable by the call's participants and
-produces no protocol error. It is the failure this document is written to
-prevent.
+produces no protocol error.
 
 A member of the room that hosts a call room is not thereby a participant
 of the call: the call room is a different MLS group with a different key
 schedule, and membership of the parent conveys no ability to compute the
-child's secrets. The reverse is also true, which is worth stating because
-the room-policy relationship might suggest otherwise: a participant of a
+child's secrets. The reverse also holds, which the room-policy
+relationship might not suggest: a participant of a
 parent-dependent room computes nothing about its parent's traffic beyond
 what its own membership of the parent gives it.
 
@@ -297,5 +294,4 @@ this document makes no interoperability claim.
 {:numbered="false"}
 
 The call-room note in {{I-D.ietf-mimi-room-policy}}, Section 5 is what
-suggested that the shape of the room was the answer rather than an
-incidental example.
+suggested that the shape of the room mattered to the keying.

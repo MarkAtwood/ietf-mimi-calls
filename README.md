@@ -10,22 +10,21 @@ mimi-protocol §10.2 and §10.3 showing the registry such a component
 would live in. mimi-content §5.10 then puts further discussion of
 calling out of scope, so nothing says which component keys the media.
 
-The argument the draft makes, which the pieces do not make for
-themselves: `SafeExportSecret(ComponentID)` takes a ComponentID and
-nothing else and is derived from the group's epoch secret, so **every
-member of the group can compute it**. Entitlement to a call's media
-cannot be established by deriving keys from the group secret; it can
-only be established by the membership of the group the secret comes
-from. A call among three people in a twenty-person room, keyed from that
-room, is readable by all twenty.
+The constraint the draft turns on: `SafeExportSecret(ComponentID)` takes
+a ComponentID and nothing else and is derived from the group's epoch
+secret, so every member of the group can compute it. Entitlement to a
+call's media cannot come from deriving keys off the group secret, only
+from the membership of the group the secret comes from. A call among
+three people in a twenty-person room, keyed from that room, is readable
+by all twenty.
 
-So the draft gives a call its own room — the parent-dependent,
-fixed-membership shape room-policy §5 already names — and derives the
-media secret there. Every epoch change rekeys the call, which means
-removing a participant takes their media access with it and needs no
-rekeying protocol. For a call among a subset of a room without a room of
-its own, it describes distributing a secret with mls-extensions §4.2's
-Safe HPKE instead, and what that costs.
+So the draft gives a call its own room, the parent-dependent
+fixed-membership shape room-policy §5 already names, and derives the
+media secret there. Every epoch change rekeys the call, so removing a
+participant takes their media access with it and no rekeying protocol is
+needed. For a call among a subset of a room, it describes distributing a
+secret with mls-extensions §4.2's Safe HPKE instead, and what that
+costs.
 
 Not posted. Nothing here is implemented between two implementations and
 no interoperability claim is made.
