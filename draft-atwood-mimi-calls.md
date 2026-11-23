@@ -185,7 +185,7 @@ its own; in both cases `media_secret` is the shared input and the media
 layer derives from it. What this document specifies is where the shared
 secret comes from and who can compute it.
 
-## Rekeying
+## Rekeying {#rekeying}
 
 A call is rekeyed by its group rather than by anything in this document.
 
@@ -203,6 +203,16 @@ Two properties follow:
 
 * A participant added to the call cannot compute the secret of any
   earlier epoch, so earlier media stays unreadable to them.
+
+A user who leaves the parent room rather than the call is a different
+case. {{I-D.ietf-mimi-room-policy}}, Section 5 requires such a user to
+be removed from the parent's parent-dependent rooms, but the Hub that
+sees the parent change is not a member of the call's group and cannot
+commit that removal; it can only propose it. The removal takes effect
+when a member of the call next commits, and until then the departed user
+is still in the call's group and still computes `media_secret`. An
+implementation whose calls must follow the parent's membership closely
+needs a member of the call to commit soon after the parent changes.
 
 # A Call Among a Subset of a Room {#subset}
 
@@ -245,6 +255,15 @@ child's secrets. The reverse also holds, which the room-policy
 relationship might not suggest: a participant of a
 parent-dependent room computes nothing about its parent's traffic beyond
 what its own membership of the parent gives it.
+
+The window in {{rekeying}} is itself a consideration. A user removed
+from the call loses the media with the Commit that removes them, but a
+user who merely leaves the parent room keeps `media_secret` until a
+member of the call commits the removal the Hub proposes. Section 5 of
+{{I-D.ietf-mimi-room-policy}} reads as though that removal were
+immediate. It is not, for any Hub that is not a member of the call's
+group, and an implementation MUST NOT present leaving the parent as
+leaving the call.
 
 Media is carried outside MLS, typically through a media server that
 forwards it. Such a server learns who is speaking to whom and for how
