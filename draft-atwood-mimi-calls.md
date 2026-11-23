@@ -284,11 +284,15 @@ This section is to be removed before publication, per {{RFC7942}}.
 
 The argument of {{why}} came out of implementing Section 5.10 in mimid,
 an implementation of the MIMI drafts. mimid converts a `session` part to
-and from its own front ends and does not fetch it. At the time of
-writing mimid implements neither the exporter of
-{{I-D.ietf-mls-extensions}}, Section 4.4 nor parent-dependent rooms, so
-no part of {{own-room}} has been tested between two implementations, and
-this document makes no interoperability claim.
+and from its own front ends and does not fetch it.
+
+mimid implements the exporter of {{I-D.ietf-mls-extensions}},
+Section 4.4, over OpenMLS, which supplies it. Its tests confirm the two
+properties {{why}} and {{own-room}} rest on: two members of a group
+derive the same secret for a component, and a Commit changes it. It does
+not implement parent-dependent rooms, so no part of {{own-room}} has
+been exercised as a call, and this document makes no interoperability
+claim.
 
 # Acknowledgements
 {:numbered="false"}
